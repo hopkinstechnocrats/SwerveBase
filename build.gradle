@@ -86,3 +86,10 @@ jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
+
+
+tasks.register('printJavaHome') {
+    doLast {
+        println org.gradle.internal.jvm.Jvm.current().getJavaHome()
+    }
+}

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -26,7 +27,18 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import lib.Loggable;
+import badlog.lib.BadLog;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,10 +54,17 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
+  public BadLog log;
+  public File logFile;
+  public BufferedWriter logFileWriter;
+  private final List<Loggable> loggables;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    loggables = new ArrayList<Loggable>();
+    loggables.add(singleModuleTestFixture);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -137,5 +156,25 @@ public class RobotContainer {
     // // Run path following command, then stop at the end.
     // return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
     return null;
+  }
+
+  public void initializeLog() {
+    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+    String filepath = "/home/lvuser/logs" + timeStamp + ".bag";
+
+
+    File file = new File(filepath);
+    try {
+        //noinspection ResultOfMethodCallIgnored
+        file.createNewFile();
+        logFileWriter = new BufferedWriter(new FileWriter(file));
+    } catch (IOException e) {
+        DriverStation.reportError("File Creation error", e.getStackTrace());
+    }
+
+    log = BadLog.init(filepath);
+    for (Loggable loggable : loggables) {
+        loggable.logInit();
+    }
   }
 }

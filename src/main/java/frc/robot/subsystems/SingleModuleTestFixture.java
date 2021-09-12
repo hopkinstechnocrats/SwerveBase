@@ -15,12 +15,14 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.TestFixtureConstants;
+import lib.Loggable;
+import badlog.lib.BadLog;
 
-public class SingleModuleTestFixture extends SubsystemBase {
+
+public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
   /** Creates a new SingleModuleTestFixture. */
 
   private final WPI_TalonFX driveMotor = new WPI_TalonFX(TestFixtureConstants.kDriveMotorPort);
@@ -80,5 +82,19 @@ public class SingleModuleTestFixture extends SubsystemBase {
     turningMotor.set(turnOutput);
     turningMotor.feed();
     // This method will be called once per scheduler run
+  }
+
+  public void logInit() {
+    BadLog.createValue("P Gain", ""+m_turningPIDController.getP());
+    BadLog.createValue("I Gain", ""+m_turningPIDController.getI());
+    BadLog.createValue("D Gain", ""+m_turningPIDController.getD());
+
+    BadLog.createTopic("Steering Rotation Angle Degrees", "degrees", () -> getAngle().getDegrees());
+    BadLog.createTopic("Steering Rotation Angle Radians", "rad", () -> getAngle().getRadians());
+
+    BadLog.createTopic("Steering PID Position Error", "rad", () -> m_turningPIDController.getPositionError(), "join:Swerve PID Control");
+    BadLog.createTopic("Steering PID Velocity Error", "rad", () -> m_turningPIDController.getVelocityError(), "join:Swerve PID Control");
+    BadLog.createTopic("Steering PID Setpoint", "rad", () -> m_turningPIDController.getSetpoint(), "join:Swerve PID Control");
+    BadLog.createTopic("Steering Motor Output", "PercentOutput", () -> turningMotor.get(), "join:Swerve PID Control");
   }
 }
