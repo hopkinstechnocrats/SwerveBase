@@ -30,7 +30,7 @@ public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
   private final DigitalSource encoderPWMPort = new DigitalInput(TestFixtureConstants.kAngleEncoderPort);
   private final DutyCycle encoderPWM = new DutyCycle(encoderPWMPort);
   private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(encoderPWM);
-  private final PIDController m_turningPIDController =
+  private final PIDController m_turningPIDController = 
       new PIDController(
           ModuleConstants.kPModuleTurningController,
           0,
@@ -41,6 +41,7 @@ public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
           );
 
   private Rotation2d swerveAngle;
+  private final PIDController velocityPIDController = new PIDController(0.1, 0, 0);
 
   public SingleModuleTestFixture() {
     driveMotor.setNeutralMode(NeutralMode.Brake);
@@ -60,6 +61,7 @@ public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
     swerveAngle = desiredAngle;
   }
 
+
   public double getRevolutions() {
     return this.angleEncoder.get();
   }
@@ -77,10 +79,13 @@ public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
     SmartDashboard.putNumber("EncoderOutput", this.encoderPWM.getOutput());
     SmartDashboard.putNumber("PIDSetpoint", m_turningPIDController.getSetpoint());
     SmartDashboard.putNumber("PIDInput", m_turningPIDController.getPositionError());
-    final var turnOutput =
-        m_turningPIDController.calculate(getAngle().getRadians(), swerveAngle.getRadians());
-    turningMotor.set(turnOutput);
-    turningMotor.feed();
+    //final var turnOutput =
+        //m_turningPIDController.calculate(getAngle().getRadians(), swerveAngle.getRadians());
+    //turningMotor.set(turnOutput);
+    //turningMotor.feed();
+    
+    final double velocity = velocityPIDController.calculate((driveMotor.getSelectedSensorVelocity()/204.8), TestFixtureConstants.kTestVelocity);
+    driveMotor.set(velocity);
     // This method will be called once per scheduler run
   }
 
@@ -92,9 +97,12 @@ public class SingleModuleTestFixture extends SubsystemBase implements Loggable {
     BadLog.createTopic("Steering Rotation Angle Degrees", "degrees", () -> getAngle().getDegrees());
     BadLog.createTopic("Steering Rotation Angle Radians", "rad", () -> getAngle().getRadians());
 
-    BadLog.createTopic("Steering PID Position Error", "rad", () -> m_turningPIDController.getPositionError(), "join:Swerve PID Control");
-    BadLog.createTopic("Steering PID Velocity Error", "rad", () -> m_turningPIDController.getVelocityError(), "join:Swerve PID Control");
-    BadLog.createTopic("Steering PID Setpoint", "rad", () -> m_turningPIDController.getSetpoint(), "join:Swerve PID Control");
-    BadLog.createTopic("Steering Motor Output", "PercentOutput", () -> turningMotor.get(), "join:Swerve PID Control");
+    BadLog.createTopic("Steering PID Position Error", "rad", () -> m_turningPIDController.getPositionError(), "join:Swerve Steering PID Control");
+    BadLog.createTopic("Steering PID Setpoint", "rad", () -> m_turningPIDController.getSetpoint(), "join:Swerve Steering PID Control");
+    BadLog.createTopic("Steering Motor Output", "PercentOutput", () -> turningMotor.get(), "join:Swerve Steering PID Control");
+
+    BadLog.createTopic("Steering PID Position Error", "rad", () -> velocityPIDController.getPositionError(), "join:Swerve Driving PID Control");
+    BadLog.createTopic("Steering PID Setpoint", "rad", () -> velocityPIDController.getSetpoint(), "join:Swerve Driving PID Control");
+    BadLog.createTopic("Steering Motor Output", "PercentOutput", () -> driveMotor.get(), "join:Swerve Driving PID Control");
   }
 }

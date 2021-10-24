@@ -25,6 +25,7 @@ public final class Constants {
     public static final int kfalconEncoderCPR = 2048;
     public static final double kSteeringGearRatio = 12.8;
     public static final double kEncoderTicksPerRevolution = kfalconEncoderCPR * kSteeringGearRatio;
+    public static final double kTestVelocity = 5;
   }
 
   public static final class DriveConstants {
