@@ -48,8 +48,8 @@ import badlog.lib.BadLog;
  */
 public class RobotContainer {
   // The robot's subsystems
-//   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final SingleModuleTestFixture singleModuleTestFixture = new SingleModuleTestFixture();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  // private final SingleModuleTestFixture singleModuleTestFixture = new SingleModuleTestFixture();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -64,28 +64,28 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     loggables = new ArrayList<Loggable>();
-    loggables.add(singleModuleTestFixture);
+    // loggables.add(driv);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    // m_robotDrive.setDefaultCommand(
-    //     // A split-stick arcade command, with forward/backward controlled by the left
-    //     // hand, and turning controlled by the right.
-    //     new RunCommand(
-    //         () ->
-    //             m_robotDrive.drive(
-    //                 m_driverController.getY(GenericHID.Hand.kLeft),
-    //                 m_driverController.getX(GenericHID.Hand.kRight),
-    //                 m_driverController.getX(GenericHID.Hand.kLeft),
-    //                 false)));
+    m_robotDrive.setDefaultCommand(
+        // A split-stick arcade command, with forward/backward controlled by the left
+        // hand, and turning controlled by the right.
+        new RunCommand(
+            () ->
+                m_robotDrive.drive(
+                    m_driverController.getX(GenericHID.Hand.kLeft),
+                    m_driverController.getY(GenericHID.Hand.kLeft),
+                    m_driverController.getX(GenericHID.Hand.kRight),
+                    false), m_robotDrive));
 
-    singleModuleTestFixture.setDefaultCommand(
-            new RunCommand(
-                () -> 
-                    singleModuleTestFixture.setState(
-                        m_driverController.getY(GenericHID.Hand.kLeft), m_driverController.getY(GenericHID.Hand.kRight)),
-                singleModuleTestFixture)
-    );
+    // singleModuleTestFixture.setDefaultCommand(
+    //         new RunCommand(
+    //             () -> 
+    //                 singleModuleTestFixture.setState(
+    //                     m_driverController.getY(GenericHID.Hand.kLeft), m_driverController.getY(GenericHID.Hand.kRight)),
+    //             singleModuleTestFixture)
+    // );
   }
 
   /**
@@ -95,15 +95,15 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-      JoystickButton AButton = new JoystickButton(m_driverController, 0);
-      JoystickButton BButton = new JoystickButton(m_driverController, 1);
-      JoystickButton CButton = new JoystickButton(m_driverController, 2);
-      JoystickButton DButton = new JoystickButton(m_driverController, 3);
+      // JoystickButton AButton = new JoystickButton(m_driverController, 0);
+      // JoystickButton BButton = new JoystickButton(m_driverController, 1);
+      // JoystickButton CButton = new JoystickButton(m_driverController, 2);
+      // JoystickButton DButton = new JoystickButton(m_driverController, 3);
 
-      AButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(1, 0))));
-      BButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, 1))));
-      CButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(-1, 0))));
-      DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));
+      // AButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(1, 0))));
+      // BButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, 1))));
+      // CButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(-1, 0))));
+      // DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));
 
   }
 

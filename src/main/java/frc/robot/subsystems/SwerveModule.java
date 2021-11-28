@@ -8,71 +8,67 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import frc.robot.Constants;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ModuleConstants;
+import lib.Loggable;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import badlog.lib.BadLog;
 
 public class SwerveModule {
-  private final Spark m_driveMotor;
-  private final Spark m_turningMotor;
+  WPI_TalonFX driveMotor;
+  WPI_TalonFX turningMotor;
+  CANCoder encoder; 
+  String corners;
 
-  private final Encoder m_driveEncoder;
-  private final Encoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
-  // Using a TrapezoidProfile PIDController to allow for smooth turning
-  private final ProfiledPIDController m_turningPIDController =
-      new ProfiledPIDController(
-          ModuleConstants.kPModuleTurningController,
-          0,
-          0,
-          new TrapezoidProfile.Constraints(
-              ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+  private final PIDController m_turningPIDController = 
+      new PIDController(
+        ModuleConstants.kPModuleTurningController,
+        0,
+        0
+        );
+        
 
-  /**
-   * Constructs a SwerveModule.
-   *
-   * @param driveMotorChannel ID for the drive motor.
-   * @param turningMotorChannel ID for the turning motor.
-   */
-  public SwerveModule(
-      int driveMotorChannel,
-      int turningMotorChannel,
-      int[] driveEncoderPorts,
-      int[] turningEncoderPorts,
-      boolean driveEncoderReversed,
-      boolean turningEncoderReversed) {
+  private Rotation2d swerveAngle;
+  private double offset;
+  private boolean inverted;
 
-    m_driveMotor = new Spark(driveMotorChannel);
-    m_turningMotor = new Spark(turningMotorChannel);
+  public SwerveModule(int DriveMotorReport, 
+  int TurningMotorReport, int DriveEncoderReport,
+   int TurningEncoderReport, boolean DriveEncoderReversed, 
+    boolean TurningEncoderReversed, String corners, double turningEncoderOffset){
 
-    this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+    this.corners = corners;
+    this.offset = turningEncoderOffset;
+    encoder = new CANCoder(TurningEncoderReport);
 
-    this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
-
-    // Set the distance per pulse for the drive encoder. We can simply use the
-    // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
-    m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
-
-    // Set whether drive encoder should be reversed or not
-    m_driveEncoder.setReverseDirection(driveEncoderReversed);
-
-    // Set the distance (in this case, angle) per pulse for the turning encoder.
-    // This is the the angle through an entire rotation (2 * wpi::math::pi)
-    // divided by the encoder resolution.
-    m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
-
-    // Set whether turning encoder should be reversed or not
-    m_turningEncoder.setReverseDirection(turningEncoderReversed);
-
-    // Limit the PID Controller's input range between -pi and pi and set the input
-    // to be continuous.
+    driveMotor = new WPI_TalonFX(DriveMotorReport);
+    turningMotor = new WPI_TalonFX(TurningMotorReport);
+    final CANCoder encoder = new CANCoder(TurningEncoderReport);
+    driveMotor.setNeutralMode(NeutralMode.Brake);
+    turningMotor.setNeutralMode(NeutralMode.Brake);
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    swerveAngle = new Rotation2d(0,1);
+    SmartDashboard.putNumber(corners + "P Gain Input", 0);
+    SmartDashboard.putNumber(corners + "I Gain Input", 0);
+    SmartDashboard.putNumber(corners + "D Gain Input", 0);
+    SmartDashboard.putNumber(corners + "Angle Setpoint Degrees", 0);
+    
+  }
+
+  public void periodic() {
+    SmartDashboard.putNumber(corners + "SwerveAngle", this.getAngle().getRadians());
   }
 
   /**
@@ -80,8 +76,20 @@ public class SwerveModule {
    *
    * @return The current state of the module.
    */
+  public Rotation2d getAngle() {
+    return Rotation2d.fromDegrees(encoder.getAbsolutePosition()).minus(new Rotation2d(offset));
+  }
+
+  public Rotation2d getError(Rotation2d actual, Rotation2d desired) {
+    return desired.minus(actual);
+  }
+
+  public void setInverted(boolean inverted) {
+    this.inverted = inverted;
+  }
+
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.get()));
+    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/Constants.ModuleConstants.kfalconEncoderCPR*10)*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
   }
 
   /**
@@ -90,26 +98,53 @@ public class SwerveModule {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
+    
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
+        SwerveModuleState.optimize(desiredState, getAngle());
 
     // Calculate the drive output from the drive PID controller.
-    final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
+    final double driveOutput = inverted ?
+        state.speedMetersPerSecond*Constants.DriveConstants.kvVoltSecondsPerMeter
+        : -1*state.speedMetersPerSecond*Constants.DriveConstants.kvVoltSecondsPerMeter ;
 
     // Calculate the turning motor output from the turning PID controller.
-    final var turnOutput =
-        m_turningPIDController.calculate(m_turningEncoder.get(), state.angle.getRadians());
+    final Double turnOutput =
+        m_turningPIDController.calculate(getAngle().getRadians(), state.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
-    m_driveMotor.set(driveOutput);
-    m_turningMotor.set(turnOutput);
+    driveMotor.setVoltage(driveOutput);
+    turningMotor.setVoltage(turnOutput);
+
+    SmartDashboard.putNumber(corners + "Turn Output", turnOutput);
+
+    SmartDashboard.putNumber(corners + "SwerveAngle", this.getAngle().getRadians());
+    SmartDashboard.putNumber(corners + "PIDSetpoint", m_turningPIDController.getSetpoint());
+    SmartDashboard.putNumber(corners + "PIDInput", m_turningPIDController.getPositionError());
+    SmartDashboard.putNumber(corners + "P Gain", m_turningPIDController.getP());
+    SmartDashboard.putNumber(corners + "D Gain", m_turningPIDController.getD());
+    SmartDashboard.putNumber(corners + "I Gain", m_turningPIDController.getI());
+
+    SmartDashboard.putNumber(corners + "Computed Error", getError(getAngle(),swerveAngle).getRadians());
+    SmartDashboard.putNumber(corners + "Steering PID Position Error", m_turningPIDController.getPositionError());
   }
 
   /** Zeros all the SwerveModule encoders. */
   public void resetEncoders() {
-    m_driveEncoder.reset();
-    m_turningEncoder.reset();
+
+  }
+
+  public void logInit() {
+    BadLog.createValue(corners + "P Gain", ""+m_turningPIDController.getP());
+    BadLog.createValue(corners + "I Gain", ""+m_turningPIDController.getI());
+    BadLog.createValue(corners + "D Gain", ""+m_turningPIDController.getD());
+
+    BadLog.createTopic(corners + "Steering Rotation Angle Degrees", "degrees", () -> getAngle().getDegrees());
+    BadLog.createTopic(corners + "Steering Rotation Angle Radians", "rad", () -> getAngle().getRadians());
+
+    BadLog.createTopic(corners + "Steering PID Position Error", "rad", () -> m_turningPIDController.getPositionError(), "join:Swerve Steering PID Control");
+    BadLog.createTopic(corners + "Steering PID Setpoint", "rad", () -> m_turningPIDController.getSetpoint(), "join:Swerve Steering PID Control");
+    BadLog.createTopic(corners + "Steering Motor Output", "PercentOutput", () -> turningMotor.get(), "join:Swerve Steering PID Control");
+
   }
 }

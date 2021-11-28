@@ -22,57 +22,70 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
+          DriveConstants.kFrontLeftDriveEncoderPort,
+          DriveConstants.kFrontLeftTurningEncoderPort,
           DriveConstants.kFrontLeftDriveEncoderReversed,
-          DriveConstants.kFrontLeftTurningEncoderReversed);
+          DriveConstants.kFrontLeftTurningEncoderReversed,
+          "FrontLeft", DriveConstants.kFrontLeftOffset);
+
 
   private final SwerveModule m_rearLeft =
       new SwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
+          DriveConstants.kRearLeftDriveEncoderPort,
+          DriveConstants.kRearLeftTurningEncoderPort,
           DriveConstants.kRearLeftDriveEncoderReversed,
-          DriveConstants.kRearLeftTurningEncoderReversed);
+          DriveConstants.kRearLeftTurningEncoderReversed,
+          "RearLeft", DriveConstants.kRearLeftOffset);
 
   private final SwerveModule m_frontRight =
       new SwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
+          DriveConstants.kFrontRightDriveEncoderPort,
+          DriveConstants.kFrontRightTurningEncoderPort,
           DriveConstants.kFrontRightDriveEncoderReversed,
-          DriveConstants.kFrontRightTurningEncoderReversed);
+          DriveConstants.kFrontRightTurningEncoderReversed,
+          "FrontRight", DriveConstants.kFrontRightOffset);
 
   private final SwerveModule m_rearRight =
       new SwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
+          DriveConstants.kRearRightDriveEncoderPort,
+          DriveConstants.kRearRightTurningEncoderPort,
           DriveConstants.kRearRightDriveEncoderReversed,
-          DriveConstants.kRearRightTurningEncoderReversed);
+          DriveConstants.kRearRightTurningEncoderReversed,
+          "RearRight", DriveConstants.kRearRightOffset);
+  
+  
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  // private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+  // SwerveDriveOdometry m_odometry =
+  //     new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    m_rearLeft.setInverted(true);
+  }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        new Rotation2d(getHeading()),
-        m_frontLeft.getState(),
-        m_rearLeft.getState(),
-        m_frontRight.getState(),
-        m_rearRight.getState());
+    // m_odometry.update(
+    //     new Rotation2d(getHeading()),
+    //     m_frontLeft.getState(),
+    //     m_rearLeft.getState(),
+    //     m_frontRight.getState(),
+    //     m_rearRight.getState());
+    m_frontLeft.periodic();
+    m_frontRight.periodic();
+    m_rearLeft.periodic();
+    m_rearRight.periodic();
   }
 
   /**
@@ -80,18 +93,18 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
+  // public Pose2d getPose() {
+  //   return m_odometry.getPoseMeters();
+  // }
 
   /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
-  }
+  // public void resetOdometry(Pose2d pose) {
+  //   m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+  // }
 
   /**
    * Method to drive the robot using joystick info.
@@ -105,9 +118,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+            // fieldRelative
+            //     ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+            //     :
+                 new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -139,25 +153,25 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.reset();
-  }
+  // public void zeroHeading() {
+  //   m_gyro.reset();
+  // }
 
   /**
    * Returns the heading of the robot.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
-  }
+  // public double getHeading() {
+  //   return m_gyro.getRotation2d().getDegrees();
+  // }
 
   /**
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  }
+  // public double getTurnRate() {
+  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  // }
 }

@@ -20,39 +20,40 @@ public final class Constants {
 
   public static final class TestFixtureConstants {
     public static final int kDriveMotorPort = 1;
-    public static final int kTurningMotorPort = 3;
+    public static final int kTurningMotorPort = 2;
     public static final int kAngleEncoderPort = 0;
     public static final int kfalconEncoderCPR = 2048;
     public static final double kSteeringGearRatio = 12.8;
     public static final double kEncoderTicksPerRevolution = kfalconEncoderCPR * kSteeringGearRatio;
     public static final double kTestVelocity = 5;
+	  public static int kCANCoderID = 21;
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 0;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 4;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final int kFrontLeftDriveMotorPort = 1;
+    public static final int kRearLeftDriveMotorPort = 3;
+    public static final int kFrontRightDriveMotorPort = 5;
+    public static final int kRearRightDriveMotorPort = 7;
 
-    public static final int kFrontLeftTurningMotorPort = 1;
-    public static final int kRearLeftTurningMotorPort = 3;
-    public static final int kFrontRightTurningMotorPort = 5;
-    public static final int kRearRightTurningMotorPort = 7;
+    public static final int kFrontLeftTurningMotorPort = 2;
+    public static final int kRearLeftTurningMotorPort = 4;
+    public static final int kFrontRightTurningMotorPort = 6;
+    public static final int kRearRightTurningMotorPort = 8;
 
-    public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {5, 6};
+    public static final int kFrontLeftTurningEncoderPort = 21;
+    public static final int kRearLeftTurningEncoderPort = 14;
+    public static final int kFrontRightTurningEncoderPort = 11;
+    public static final int kRearRightTurningEncoderPort = 10; 
 
     public static final boolean kFrontLeftTurningEncoderReversed = false;
     public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = false;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {7, 8};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {9, 10};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {11, 12};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {13, 14};
+    public static final int kFrontLeftDriveEncoderPort = 0;
+    public static final int kRearLeftDriveEncoderPort = 0;
+    public static final int kFrontRightDriveEncoderPort = 0;
+    public static final int kRearRightDriveEncoderPort = 0;
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
     public static final boolean kRearLeftDriveEncoderReversed = true;
@@ -78,33 +79,31 @@ public final class Constants {
     // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
     public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = 0.8;
+    public static final double kvVoltSecondsPerMeter = 2;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+    public static final double kWheelHeight = .1;//meters
 
     public static final double kMaxSpeedMetersPerSecond = 3;
+
+    public static final double kFrontRightOffset = .13959;
+    public static final double kFrontLeftOffset = -0.079767;
+    public static final double kRearRightOffset =2.1153595 ;
+    public static final double kRearLeftOffset = -2.35159;
   }
 
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
-
-    public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = 0.15;
-    public static final double kDriveEncoderDistancePerPulse =
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kTurningEncoderDistancePerPulse =
-        // Assumes the encoders are on a 1:1 reduction with the module shaft.
-        (2 * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kPModuleTurningController = 0.1;
+    public static final double kPModuleTurningController = 1.5;
 
     public static final double kPModuleDriveController = 1;
+    public static final int kfalconEncoderCPR = 2048;
+    public static final double kSteeringGearRatio = 12.8;
+    public static final double kEncoderTicksPerRevolution = kfalconEncoderCPR * kSteeringGearRatio;
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 1;
+    public static final int kDriverControllerPort = 0;
   }
 
   public static final class AutoConstants {
