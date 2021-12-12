@@ -30,20 +30,20 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 1;
-    public static final int kRearLeftDriveMotorPort = 3;
+    public static final int kFrontLeftDriveMotorPort = 3;
+    public static final int kRearLeftDriveMotorPort = 1;
     public static final int kFrontRightDriveMotorPort = 5;
     public static final int kRearRightDriveMotorPort = 7;
 
-    public static final int kFrontLeftTurningMotorPort = 2;
-    public static final int kRearLeftTurningMotorPort = 4;
+    public static final int kFrontLeftTurningMotorPort = 4;
+    public static final int kRearLeftTurningMotorPort = 2;
     public static final int kFrontRightTurningMotorPort = 6;
     public static final int kRearRightTurningMotorPort = 8;
 
-    public static final int kFrontLeftTurningEncoderPort = 21;
-    public static final int kRearLeftTurningEncoderPort = 14;
-    public static final int kFrontRightTurningEncoderPort = 11;
-    public static final int kRearRightTurningEncoderPort = 10; 
+    public static final int kFrontLeftTurningEncoderPort = 2;
+    public static final int kRearLeftTurningEncoderPort = 1;
+    public static final int kFrontRightTurningEncoderPort = 3;
+    public static final int kRearRightTurningEncoderPort = 4; 
 
     public static final boolean kFrontLeftTurningEncoderReversed = false;
     public static final boolean kRearLeftTurningEncoderReversed = true;
@@ -66,10 +66,10 @@ public final class Constants {
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2), //front left
+            new Translation2d(-1*kWheelBase / 2, kTrackWidth / 2), //rear left
+            new Translation2d(kWheelBase / 2, -1*kTrackWidth / 2), //front right
+            new Translation2d(-1*kWheelBase / 2, -1*kTrackWidth / 2)); //rear right
 
     public static final boolean kGyroReversed = false;
 
@@ -85,16 +85,16 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3;
 
-    public static final double kFrontRightOffset = .13959;
-    public static final double kFrontLeftOffset = -0.079767;
-    public static final double kRearRightOffset =2.1153595 ;
-    public static final double kRearLeftOffset = -2.35159;
+    public static final double kFrontRightOffset = -2.998932440316429;
+    public static final double kFrontLeftOffset = 0.796136928912;
+    public static final double kRearRightOffset = -1.0507768370;
+    public static final double kRearLeftOffset = -0.069029;
   }
 
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
-    public static final double kPModuleTurningController = 1.8;
+    public static final double kPModuleTurningController = 3;
 
     public static final double kPModuleDriveController = 1;
     public static final int kfalconEncoderCPR = 2048;

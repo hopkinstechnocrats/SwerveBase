@@ -100,13 +100,13 @@ public class SwerveModule {
   public void setDesiredState(SwerveModuleState desiredState) {
     
     // Optimize the reference state to avoid spinning further than 90 degrees
-    SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, getAngle());
+    SwerveModuleState state = desiredState;
+        // SwerveModuleState.optimize(desiredState, getAngle());
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput = inverted ?
         state.speedMetersPerSecond*Constants.DriveConstants.kvVoltSecondsPerMeter
-        : -1*state.speedMetersPerSecond*Constants.DriveConstants.kvVoltSecondsPerMeter ;
+        : -1*state.speedMetersPerSecond*Constants.DriveConstants.kvVoltSecondsPerMeter;
 
     // Calculate the turning motor output from the turning PID controller.
     final Double turnOutput =

@@ -74,9 +74,9 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getX(GenericHID.Hand.kLeft),
-                    m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight),
+                    -1*m_driverController.getY(GenericHID.Hand.kLeft),
+                    -1*m_driverController.getX(GenericHID.Hand.kLeft),
+                    -1*m_driverController.getX(GenericHID.Hand.kRight),
                     false), m_robotDrive));
 
     // singleModuleTestFixture.setDefaultCommand(

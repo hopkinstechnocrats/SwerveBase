@@ -71,6 +71,8 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     m_rearLeft.setInverted(true);
+    m_frontLeft.setInverted(true);
+
   }
 
   @Override
@@ -125,8 +127,8 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearLeft.setDesiredState(swerveModuleStates[1]);
+    m_frontRight.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
@@ -139,8 +141,8 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.normalizeWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
+    m_rearLeft.setDesiredState(desiredStates[1]);
+    m_frontRight.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
