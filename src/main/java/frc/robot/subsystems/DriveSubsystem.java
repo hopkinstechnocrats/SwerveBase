@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -13,7 +15,9 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SerialPort;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
@@ -62,11 +66,13 @@ public class DriveSubsystem extends SubsystemBase {
   
 
   // The gyro sensor
-  // private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final Gyro m_gyro = new AHRS(SerialPort.Port.kMXP);
 
   // Odometry class for tracking robot pose
-  // SwerveDriveOdometry m_odometry =
-  //     new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+  SwerveDriveOdometry m_odometry =
+     new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+
+  private SwerveModuleState[] swerveModuleStates;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -78,16 +84,17 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    // m_odometry.update(
-    //     new Rotation2d(getHeading()),
-    //     m_frontLeft.getState(),
-    //     m_rearLeft.getState(),
-    //     m_frontRight.getState(),
-    //     m_rearRight.getState());
+    m_odometry.update(
+      new Rotation2d(getHeading()),
+      m_frontLeft.getState(),
+      m_rearLeft.getState(),
+      m_frontRight.getState(),
+      m_rearRight.getState());
     m_frontLeft.periodic();
     m_frontRight.periodic();
     m_rearLeft.periodic();
     m_rearRight.periodic();
+    SmartDashboard.putNumber("Heading", getHeading());
   }
 
   /**
@@ -118,12 +125,17 @@ public class DriveSubsystem extends SubsystemBase {
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var swerveModuleStates =
+    if (fieldRelative == true) {
+      swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
-            // fieldRelative
-            //     ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-            //     :
-                 new ChassisSpeeds(xSpeed, ySpeed, rot));
+          // fieldRelative
+          ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d()));
+    } else{
+      swerveModuleStates =
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(
+          new ChassisSpeeds(xSpeed, ySpeed, rot));
+    }
+
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -155,25 +167,25 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  // public void zeroHeading() {
-  //   m_gyro.reset();
-  // }
+  public void zeroHeading() {
+    m_gyro.reset();
+  }
 
   /**
    * Returns the heading of the robot.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  // public double getHeading() {
-  //   return m_gyro.getRotation2d().getDegrees();
-  // }
+  public double getHeading() {
+    return m_gyro.getRotation2d().getDegrees();
+  }
 
   /**
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  // public double getTurnRate() {
-  //   return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  // }
+  public double getTurnRate() {
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
 }

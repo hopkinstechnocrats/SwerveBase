@@ -76,8 +76,8 @@ public class RobotContainer {
                 m_robotDrive.drive(
                     -1*m_driverController.getY(GenericHID.Hand.kLeft),
                     -1*m_driverController.getX(GenericHID.Hand.kLeft),
-                    -1*m_driverController.getX(GenericHID.Hand.kRight),
-                    false), m_robotDrive));
+                    -6*m_driverController.getX(GenericHID.Hand.kRight),
+                    true), m_robotDrive)); // use this to change from field oriented to non-field oriented
 
     // singleModuleTestFixture.setDefaultCommand(
     //         new RunCommand(
@@ -95,12 +95,12 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-      // JoystickButton AButton = new JoystickButton(m_driverController, 0);
-      // JoystickButton BButton = new JoystickButton(m_driverController, 1);
-      // JoystickButton CButton = new JoystickButton(m_driverController, 2);
-      // JoystickButton DButton = new JoystickButton(m_driverController, 3);
+      JoystickButton AButton = new JoystickButton(m_driverController, 1);
+      // JoystickButton BButton = new JoystickButton(m_driverController, 2);
+      // JoystickButton CButton = new JoystickButton(m_driverController, 3);
+      // JoystickButton DButton = new JoystickButton(m_driverController, 4);
 
-      // AButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(1, 0))));
+      AButton.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
       // BButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, 1))));
       // CButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(-1, 0))));
       // DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));

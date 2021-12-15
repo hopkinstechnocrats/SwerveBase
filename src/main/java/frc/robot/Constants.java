@@ -94,7 +94,7 @@ public final class Constants {
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
-    public static final double kPModuleTurningController = 3;
+    public static final double kPModuleTurningController = 4.1;
 
     public static final double kPModuleDriveController = 1;
     public static final int kfalconEncoderCPR = 2048;
