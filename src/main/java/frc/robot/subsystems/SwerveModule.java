@@ -105,7 +105,7 @@ public class SwerveModule {
     // Calculate the drive output from the drive PID controller.
     final double driveOutput = inverted ?
         m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)
-        : -1*m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)
+        : -1*m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final Double turnOutput =
@@ -116,7 +116,7 @@ public class SwerveModule {
     turningMotor.setVoltage(turnOutput);
 
     SmartDashboard.putNumber(corners + "Turn Output", turnOutput);
-
+    SmartDashboard.putNumber(corners + "Desired State m/s", desiredState.speedMetersPerSecond);
     SmartDashboard.putNumber(corners + "SwerveAngle", this.getAngle().getRadians());
     SmartDashboard.putNumber(corners + "PIDSetpoint", m_turningPIDController.getSetpoint());
     SmartDashboard.putNumber(corners + "PIDInput", m_turningPIDController.getPositionError());
