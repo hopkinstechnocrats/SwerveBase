@@ -66,7 +66,7 @@ public class DriveSubsystem extends SubsystemBase {
   
 
   // The gyro sensor
-  private final Gyro m_gyro = new AHRS(SerialPort.Port.kMXP);
+  private final AHRS m_gyro = new AHRS(SerialPort.Port.kMXP);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
@@ -168,7 +168,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    m_gyro.zeroYaw();
   }
 
   /**
@@ -177,7 +177,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+    return m_gyro.pidGet();
   }
 
   /**
