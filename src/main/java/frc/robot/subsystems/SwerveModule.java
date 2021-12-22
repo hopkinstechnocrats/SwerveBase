@@ -89,7 +89,7 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/Constants.ModuleConstants.kfalconEncoderCPR*10)*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
+    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/ModuleConstants.kEncoderTicksPerRevolution*10)*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
   }
 
   /**
