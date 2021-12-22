@@ -89,7 +89,7 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/(Constants.ModuleConstants.kfalconEncoderCPR*10))*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
+    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/ModuleConstants.kEncoderTicksPerRevolution*10)*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
   }
   //
 
@@ -117,7 +117,7 @@ public class SwerveModule {
     turningMotor.setVoltage(turnOutput);
 
     SmartDashboard.putNumber(corners + "Turn Output", turnOutput);
-
+    SmartDashboard.putNumber(corners + "Desired State m/s", desiredState.speedMetersPerSecond);
     SmartDashboard.putNumber(corners + "SwerveAngle", this.getAngle().getRadians());
     SmartDashboard.putNumber(corners + "PIDSetpoint", m_turningPIDController.getSetpoint());
     SmartDashboard.putNumber(corners + "PIDInput", m_turningPIDController.getPositionError());
