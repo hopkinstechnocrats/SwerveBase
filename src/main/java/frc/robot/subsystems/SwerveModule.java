@@ -89,8 +89,9 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/Constants.ModuleConstants.kfalconEncoderCPR*10)*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
+    return new SwerveModuleState((driveMotor.getSelectedSensorVelocity()/(Constants.ModuleConstants.kfalconEncoderCPR*10))*Constants.DriveConstants.kWheelHeight*Math.PI, getAngle());
   }
+  //
 
   /**
    * Sets the desired state for the module.
@@ -105,7 +106,7 @@ public class SwerveModule {
     // Calculate the drive output from the drive PID controller.
     final double driveOutput = inverted ?
         m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)
-        : -1*m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)
+        : -1*m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final Double turnOutput =
