@@ -78,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     m_rearLeft.setInverted(true);
     m_frontLeft.setInverted(true);
-
+    SmartDashboard.putNumber("PID P Gain Input", 0);
   }
 
   @Override

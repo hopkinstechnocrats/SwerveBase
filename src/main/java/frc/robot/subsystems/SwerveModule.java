@@ -123,7 +123,8 @@ public class SwerveModule {
     SmartDashboard.putNumber(corners + "P Gain", m_turningPIDController.getP());
     SmartDashboard.putNumber(corners + "D Gain", m_turningPIDController.getD());
     SmartDashboard.putNumber(corners + "I Gain", m_turningPIDController.getI());
-
+    SmartDashboard.putNumber(corners + "Drive P Gain", m_drivePIDController.getP());
+    m_drivePIDController.setP(SmartDashboard.getNumber("PID P Gain Input", 0));
     SmartDashboard.putNumber(corners + "Computed Error", getError(getAngle(),swerveAngle).getRadians());
     SmartDashboard.putNumber(corners + "Steering PID Position Error", m_turningPIDController.getPositionError());
   }
