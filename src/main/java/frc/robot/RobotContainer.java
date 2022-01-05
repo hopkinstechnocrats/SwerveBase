@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -99,11 +100,16 @@ public class RobotContainer {
       // JoystickButton BButton = new JoystickButton(m_driverController, 2);
       // JoystickButton CButton = new JoystickButton(m_driverController, 3);
       // JoystickButton DButton = new JoystickButton(m_driverController, 4);
+      
+      // 
+      POVButton DPadTop = new POVButton(m_driverController, 90);
 
       AButton.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
       // BButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, 1))));
       // CButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(-1, 0))));
       // DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));
+      
+      // DPadTop.whenPressed(new InstantCommand(() -> .(90)));
 
   }
 
