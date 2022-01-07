@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.SerialPort;
@@ -68,6 +69,9 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(SerialPort.Port.kMXP);
 
+  //field
+  private final Field2d m_field = new Field2d();
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
      new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
@@ -77,6 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     SmartDashboard.putNumber("PID P Gain Input", 0);
+    SmartDashboard.putData("field", m_field);
   }
 
   @Override
@@ -93,6 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.periodic();
     m_rearRight.periodic();
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
+    m_field.setRobotPose(getPose());
   }
 
   /**
@@ -100,18 +106,18 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
-  // public Pose2d getPose() {
-  //   return m_odometry.getPoseMeters();
-  // }
+   public Pose2d getPose() {
+     return m_odometry.getPoseMeters();
+   }
 
   /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
-  // public void resetOdometry(Pose2d pose) {
-  //   m_odometry.resetPosition(pose, m_gyro.getRotation2d());
-  // }
+   public void resetOdometry(Pose2d pose) {
+     m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+   }
 
   /**
    * Method to drive the robot using joystick info.
