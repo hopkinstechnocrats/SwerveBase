@@ -84,6 +84,7 @@ public final class Constants {
     public static final double kWheelHeight = .1;//meters
 
     public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kBoostModifier = 1;
 
     public static final double kFrontRightOffset = -2.998932440316429;
     public static final double kFrontLeftOffset = 0.796136928912 - Math.PI;
@@ -95,6 +96,9 @@ public final class Constants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
     public static final double kPModuleTurningController = 4.3;
+    public static final double kIModuleTurningController = 0;
+    public static final double kDModuleTurningController = 0;
+    public static final double MaxAllowableError = 0;
 
     public static final double kPModuleDriveController = 1;
     public static final int kfalconEncoderCPR = 2048;

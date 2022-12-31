@@ -38,7 +38,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import lib.Loggable;
-import badlog.lib.BadLog;
 
 
 /*
@@ -56,16 +55,11 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  public BadLog log;
-  public File logFile;
-  public BufferedWriter logFileWriter;
-  private final List<Loggable> loggables;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    loggables = new ArrayList<Loggable>();
     // loggables.add(driv);
 
     // Configure default commands
@@ -79,6 +73,7 @@ public class RobotContainer {
                     -1*m_driverController.getLeftY(),
                     -1*m_driverController.getLeftX(),
                     -6*m_driverController.getRightX(),
+                    m_driverController.getRightTriggerAxis(),
                     true), m_robotDrive)); // use this to change from field oriented to non-field oriented
 
     // singleModuleTestFixture.setDefaultCommand(
@@ -161,26 +156,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-  }
-
-  public void initializeLog() {
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-    String filepath = "/home/lvuser/logs" + timeStamp + ".bag";
-
-
-    File file = new File(filepath);
-    try {
-        //noinspection ResultOfMethodCallIgnored
-        file.createNewFile();
-        logFileWriter = new BufferedWriter(new FileWriter(file));
-    } catch (IOException e) {
-        DriverStation.reportError("File Creation error", e.getStackTrace());
-    }
-
-    log = BadLog.init(filepath);
-    for (Loggable loggable : loggables) {
-        loggable.logInit();
-    }
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, 0, false));
   }
 }

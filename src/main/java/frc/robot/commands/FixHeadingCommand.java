@@ -39,6 +39,7 @@ public class FixHeadingCommand extends CommandBase {
         driveSubsystem.drive(
                 -1*driverController.getLeftY(),
                 -1*driverController.getLeftX(),
+                driverController.getRightTriggerAxis(),
                 output,
                 true);
     }

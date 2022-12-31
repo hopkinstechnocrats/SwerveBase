@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj.SerialPort;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
-  // Robot swerve modules
+  //rTrigger is used to add an increased max speed relative to how much the trigger is pushed. This makes it controllable and smooth.
+  double rTrigger;
+  // Define robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
@@ -125,14 +127,16 @@ public class DriveSubsystem extends SubsystemBase {
    * @param xSpeed Speed of the robot in the x direction (forward).
    * @param ySpeed Speed of the robot in the y direction (sideways).
    * @param rot Angular rate of the robot.
+   * @param rTrigger right trigger for boosted speed
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rot, double rTrigger, boolean fieldRelative) {
+    //Determines fileRelative, and drives the robot accordingly.
+    this.rTrigger = rTrigger;
     if (fieldRelative == true) {
       swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
-          // fieldRelative
           ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d()));
     } else{
       swerveModuleStates =
@@ -140,8 +144,9 @@ public class DriveSubsystem extends SubsystemBase {
           new ChassisSpeeds(xSpeed, ySpeed, rot));
     }
 
-    SwerveDriveKinematics.normalizeWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        //Desaturate = make sure speed for each module is achievable(Used to be called normalize)
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond + rTrigger * (DriveConstants.kBoostModifier));
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_rearLeft.setDesiredState(swerveModuleStates[1]);
     m_frontRight.setDesiredState(swerveModuleStates[2]);
@@ -154,8 +159,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.normalizeWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        //Desaturate = make sure speed for each module is achievable(Used to be called normalize)
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond + rTrigger * (DriveConstants.kBoostModifier));
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_rearLeft.setDesiredState(desiredStates[1]);
     m_frontRight.setDesiredState(desiredStates[2]);
@@ -175,6 +181,14 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.zeroYaw();
   }
 
+  //Sets proper offset for encoders
+  public void calculateOffset() {
+    m_frontLeft.calculateOffset();
+    m_frontRight.calculateOffset();
+    m_rearLeft.calculateOffset();
+    m_rearRight.calculateOffset();
+  }
+
   /**
    * Returns the heading of the robot.
    *
@@ -191,5 +205,13 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  //Rotate all modules to 0
+  public void turnZero() {
+    m_frontLeft.turnZero();
+    m_frontRight.turnZero();
+    m_rearLeft.turnZero();
+    m_rearRight.turnZero();
   }
 }

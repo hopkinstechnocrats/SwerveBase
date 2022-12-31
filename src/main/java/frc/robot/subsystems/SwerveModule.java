@@ -13,12 +13,16 @@ import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ModuleConstants;
 import lib.Loggable;
+
+import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import badlog.lib.BadLog;
 
@@ -38,10 +42,13 @@ public class SwerveModule {
         0,
         0
         );
+
+  TalonFXPIDSetConfiguration turningPIDConfig = new TalonFXPIDSetConfiguration();
         
 
   private Rotation2d swerveAngle;
   private double offset;
+  double tempOffset;
   private boolean inverted;
 
   public SwerveModule(int DriveMotorReport, 
@@ -58,6 +65,19 @@ public class SwerveModule {
     final CANCoder encoder = new CANCoder(TurningEncoderReport);
     driveMotor.setNeutralMode(NeutralMode.Brake);
     turningMotor.setNeutralMode(NeutralMode.Brake);
+
+    //Configure Max & Min outputs of Falcon
+    turningMotor.configNominalOutputForward(0);
+    turningMotor.configNominalOutputReverse(0);
+    turningMotor.configPeakOutputForward(1);
+    turningMotor.configPeakOutputReverse(-1);
+    turningMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
+    
+    //Configure PID Values for built in PID on falcon
+    turningMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+    turningMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
+    turningMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
+
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
     swerveAngle = new Rotation2d(0,1);
     SmartDashboard.putNumber(corners + "P Gain Input", 0);
@@ -109,17 +129,18 @@ public class SwerveModule {
         m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)
         : -1*m_drivePIDController.calculate(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond);
 
-    // Calculate the turning motor output from the turning PID controller.
-    final Double turnOutput =
-        m_turningPIDController.calculate(getAngle().getRadians(), state.angle.getRadians());
+    // Calculate the turning motor output from the turning PID controller. Not needed when running Built In PID
+    //final Double turnOutput =
+    //    m_turningPIDController.calculate(getAngle().getRadians(), state.angle.getRadians());
 
-    // Calculate the turning motor output from the turning PID controller.
     driveMotor.setVoltage(driveOutput);
-    turningMotor.setVoltage(turnOutput);
+    //turningMotor.setVoltage(turnOutput);.
+    //Uses Built in PID controller for output
+    turningMotor.set(ControlMode.Position, tempOffset + state.angle.getRadians());
 
     SmartDashboard.putNumber(corners + "Drive Output", driveOutput);
     SmartDashboard.putNumber(corners + "Measuerd Output", getState().speedMetersPerSecond);
-    SmartDashboard.putNumber(corners + "Turn Output", turnOutput);
+    //SmartDashboard.putNumber(corners + "Turn Output", turnOutput);
     SmartDashboard.putNumber(corners + "Desired State m/s", desiredState.speedMetersPerSecond);
     SmartDashboard.putNumber(corners + "SwerveAngle", this.getAngle().getRadians());
     SmartDashboard.putNumber(corners + "PIDSetpoint", m_turningPIDController.getSetpoint());
@@ -136,6 +157,20 @@ public class SwerveModule {
   /** Zeros all the SwerveModule encoders. */
   public void resetEncoders() {
 
+  }
+
+  //Rotates module to 0 radians(defaut)
+  public void turnZero() {
+    final Double turnOutput =
+        m_turningPIDController.calculate(getAngle().getRadians(), 0);
+
+    turningMotor.setVoltage(turnOutput);
+  }
+
+  //Sets offset for this power cycle - needed to use built in encoder for PID
+  public void calculateOffset() {
+    //Calculates offset as: Offset =  Falcon Encoder Value - (Cancoder value - Offset)
+    tempOffset = turningMotor.getSelectedSensorPosition() - getAngle().getRadians();
   }
 
   public void logInit() {
