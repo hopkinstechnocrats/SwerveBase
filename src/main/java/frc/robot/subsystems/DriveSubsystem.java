@@ -8,6 +8,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -68,6 +69,11 @@ public class DriveSubsystem extends SubsystemBase {
   
   
 
+  //PID controller for rotation of robot
+  ProfiledPIDController thetaController =
+        new ProfiledPIDController(
+            DriveConstants.kPThetaController, 0, 0, DriveConstants.kThetaControllerConstraints);
+
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(SerialPort.Port.kMXP);
 
@@ -84,6 +90,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     SmartDashboard.putNumber("PID P Gain Input", 0);
     SmartDashboard.putData("field", m_field);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   @Override
@@ -198,6 +205,10 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getRotation2d();
   }
 
+  public void autoRotate(double xSpeed, double ySpeed, double desiredAngleRad, double rTrigger, boolean fieldRelative) {
+    drive(xSpeed, ySpeed, thetaController.calculate(getHeading().getRadians(), desiredAngleRad), rTrigger, fieldRelative);
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -207,11 +218,27 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
+  //Rotates all modules to point to center
+  public void defence() {
+    m_frontLeft.turnRad(-Math.PI/4);
+    m_frontRight.turnRad(Math.PI/4);
+    m_rearLeft.turnRad(Math.PI/4);
+    m_rearRight.turnRad(-Math.PI/4);
+  }
+
   //Rotate all modules to 0
   public void turnZero() {
     m_frontLeft.turnZero();
     m_frontRight.turnZero();
     m_rearLeft.turnZero();
     m_rearRight.turnZero();
+  }
+
+  //Changes brake mode of all modules
+  public void brakeMode(Boolean brakeBoolean) {
+    m_frontLeft.brakeMode(brakeBoolean);
+    m_frontRight.brakeMode(brakeBoolean);
+    m_rearLeft.brakeMode(brakeBoolean);
+    m_rearRight.brakeMode(brakeBoolean);
   }
 }

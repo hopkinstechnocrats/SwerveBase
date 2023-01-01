@@ -85,6 +85,13 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kBoostModifier = 1;
+    
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+
+    public static final double kPThetaController = 2;
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+      kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
     public static final double kFrontRightOffset = -2.998932440316429;
     public static final double kFrontLeftOffset = 0.796136928912 - Math.PI;

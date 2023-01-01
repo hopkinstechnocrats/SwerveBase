@@ -159,12 +159,25 @@ public class SwerveModule {
 
   }
 
+  //Turns module to desired rotation in radians
+  public void turnRad(double Rad) {
+    turningMotor.set(ControlMode.Position, tempOffset + Rad);
+
+  }
   //Rotates module to 0 radians(defaut)
   public void turnZero() {
     final Double turnOutput =
         m_turningPIDController.calculate(getAngle().getRadians(), 0);
 
     turningMotor.setVoltage(turnOutput);
+  }
+
+  public void brakeMode(Boolean brakeBoolean) {
+    if(brakeBoolean) {
+      driveMotor.setNeutralMode(NeutralMode.Brake);
+    } else {
+      driveMotor.setNeutralMode(NeutralMode.Coast);
+    }
   }
 
   //Sets offset for this power cycle - needed to use built in encoder for PID
