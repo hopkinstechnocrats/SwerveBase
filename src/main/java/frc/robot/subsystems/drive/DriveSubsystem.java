@@ -2,16 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.drive;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -23,8 +25,14 @@ import edu.wpi.first.wpilibj.SerialPort;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  NetworkTable table = inst.getTable("Drive");
   //rTrigger is used to add an increased max speed relative to how much the trigger is pushed. This makes it controllable and smooth.
   double rTrigger;
+
+  //negate to change front of robot
+  private int negate = 1;
+  boolean fieldOriented = false;
   // Define robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
@@ -66,8 +74,6 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed,
           "RearRight", DriveConstants.kRearRightOffset);
-  
-  
 
   //PID controller for rotation of robot
   ProfiledPIDController thetaController =
@@ -80,11 +86,14 @@ public class DriveSubsystem extends SubsystemBase {
   //field
   private final Field2d m_field = new Field2d();
 
+  //Slew Rate Limiters to limit speed of ditrection changes
+  private final SlewRateLimiter xSpeedFilter = new SlewRateLimiter(5);
+  private final SlewRateLimiter ySpeedFilter = new SlewRateLimiter(5);
+  private final SlewRateLimiter rotFilter = new SlewRateLimiter(25);
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
      new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
-
-  private SwerveModuleState[] swerveModuleStates;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -125,7 +134,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
    public void resetOdometry(Pose2d pose) {
-     m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+     m_odometry.resetPosition(pose, getHeading());
    }
 
   /**
@@ -135,20 +144,33 @@ public class DriveSubsystem extends SubsystemBase {
    * @param ySpeed Speed of the robot in the y direction (sideways).
    * @param rot Angular rate of the robot.
    * @param rTrigger right trigger for boosted speed
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, double rTrigger, boolean fieldRelative) {
-    //Determines fileRelative, and drives the robot accordingly.
+  public void drive(double xSpeed, double ySpeed, double rot, double rTrigger) {
+
+    rot =  -1* MathUtil.applyDeadband(rot, 0.4);
+    ySpeed = negate*MathUtil.applyDeadband(ySpeed, 0.2);
+    xSpeed =  negate*MathUtil.applyDeadband(xSpeed, 0.2);
+    rot = rotFilter.calculate(rot);
+    ySpeed = ySpeedFilter.calculate(ySpeed);
+    xSpeed = xSpeedFilter.calculate(xSpeed);
     this.rTrigger = rTrigger;
-    if (fieldRelative == true) {
+
+    driveNoDeadband(xSpeed, ySpeed, rot);
+  }
+
+  public void driveNoDeadband(double xSpeed, double ySpeed, double rot) {
+
+    SwerveModuleState[] swerveModuleStates;
+    if (fieldOriented) {
       swerveModuleStates =
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(
-          ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d()));
+              DriveConstants.kDriveKinematics.toSwerveModuleStates(
+                      // fieldRelative
+                      ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d()));
     } else{
       swerveModuleStates =
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(
-          new ChassisSpeeds(xSpeed, ySpeed, rot));
+              DriveConstants.kDriveKinematics.toSwerveModuleStates(
+                      new ChassisSpeeds(xSpeed, ySpeed, rot));
     }
 
         //Desaturate = make sure speed for each module is achievable(Used to be called normalize)
@@ -175,14 +197,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
-  /** Resets the drive encoders to currently read a position of 0. */
-  public void resetEncoders() {
-    m_frontLeft.resetEncoders();
-    m_rearLeft.resetEncoders();
-    m_frontRight.resetEncoders();
-    m_rearRight.resetEncoders();
-  }
-
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.zeroYaw();
@@ -202,11 +216,21 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public Rotation2d getHeading() {
-    return m_gyro.getRotation2d();
+    return Rotation2d.fromDegrees(-1*m_gyro.getFusedHeading());
   }
 
-  public void autoRotate(double xSpeed, double ySpeed, double desiredAngleRad, double rTrigger, boolean fieldRelative) {
-    drive(xSpeed, ySpeed, thetaController.calculate(getHeading().getRadians(), desiredAngleRad), rTrigger, fieldRelative);
+  public void autoRotate(double xSpeed, double ySpeed, double desiredAngleRad, double rTrigger) {
+    drive(xSpeed, ySpeed, thetaController.calculate(getHeading().getRadians(), desiredAngleRad), rTrigger);
+  }
+
+  public void fieldON() {
+    fieldOriented = true;
+    driveNoDeadband(0, 0, 0);
+  }
+
+  public void fieldOFF() {
+    fieldOriented = false;
+    driveNoDeadband(0, 0, 0);
   }
 
   /**
@@ -215,30 +239,36 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getRate();
   }
 
   //Rotates all modules to point to center
   public void defence() {
-    m_frontLeft.turnRad(-Math.PI/4);
-    m_frontRight.turnRad(Math.PI/4);
-    m_rearLeft.turnRad(Math.PI/4);
-    m_rearRight.turnRad(-Math.PI/4);
-  }
-
-  //Rotate all modules to 0
-  public void turnZero() {
-    m_frontLeft.turnZero();
-    m_frontRight.turnZero();
-    m_rearLeft.turnZero();
-    m_rearRight.turnZero();
+    m_frontLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(-Math.PI/4)));
+    m_frontRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI/4)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI/4)));
+    m_rearRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(-Math.PI/4)));
   }
 
   //Changes brake mode of all modules
-  public void brakeMode(Boolean brakeBoolean) {
-    m_frontLeft.brakeMode(brakeBoolean);
-    m_frontRight.brakeMode(brakeBoolean);
-    m_rearLeft.brakeMode(brakeBoolean);
-    m_rearRight.brakeMode(brakeBoolean);
+  public void setBrakeMode(Boolean brakeBoolean) {
+    m_frontLeft.setBrakeMode(brakeBoolean);
+    m_frontRight.setBrakeMode(brakeBoolean);
+    m_rearLeft.setBrakeMode(brakeBoolean);
+    m_rearRight.setBrakeMode(brakeBoolean);
   }
+
+  public float getRoll() {
+    return -1* m_gyro.getRoll();
+  }
+
+  //Flips front of robot
+  public void makeBackwards(boolean GOGOGOGOGOGOGO) {
+    if (GOGOGOGOGOGOGO){
+      negate = -1;
+    } else{
+      negate = 1;
+    }
+  }
+
 }

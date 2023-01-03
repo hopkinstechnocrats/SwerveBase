@@ -1,6 +1,5 @@
 package lib;
 
-import badlog.lib.BadLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -166,9 +165,9 @@ public class RamseteCommand extends CommandBase {
                 m_kinematics.toWheelSpeeds(
                         m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
 
-        BadLog.publish("Drivetrain/Trajectory Pose X", m_trajectory.sample(curTime).poseMeters.getX());
-        BadLog.publish("Drivetrain/Trajectory Pose Y", m_trajectory.sample(curTime).poseMeters.getY());
-        BadLog.publish("Drivetrain/Trajectory Pose Heading", m_trajectory.sample(curTime).poseMeters.getRotation().getDegrees());
+//        BadLog.publish("Drivetrain/Trajectory Pose X", m_trajectory.sample(curTime).poseMeters.getX());
+//        BadLog.publish("Drivetrain/Trajectory Pose Y", m_trajectory.sample(curTime).poseMeters.getY());
+//        BadLog.publish("Drivetrain/Trajectory Pose Heading", m_trajectory.sample(curTime).poseMeters.getRotation().getDegrees());
 
 
         var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;

@@ -1,6 +1,5 @@
 package lib;
 
-import badlog.lib.BadLog;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 
@@ -78,7 +77,7 @@ public class MotorFaultLogger extends LoggableBase {
 
     @Override
     public void logInit() {
-        BadLog.createTopicStr("Motor Faults", BadLog.UNITLESS, this::logPeriodicCallBack, "log");
+//        BadLog.createTopicStr("Motor Faults", BadLog.UNITLESS, this::logPeriodicCallBack, "log");
     }
 
     public String logPeriodicCallBack() {
