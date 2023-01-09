@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.SerialPort;
 
+import java.util.function.BooleanSupplier;
+
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -262,12 +264,30 @@ public class DriveSubsystem extends SubsystemBase {
     return -1* m_gyro.getRoll();
   }
 
+  public float getPitch() {return m_gyro.getPitch();}
+
   //Flips front of robot
   public void makeBackwards(boolean GOGOGOGOGOGOGO) {
     if (GOGOGOGOGOGOGO){
       negate = -1;
     } else{
       negate = 1;
+    }
+  }
+  
+  public void level() {
+    if(getPitch() >= 15) {
+      drive(0, 1, 0, 0);
+    } else if (getPitch() <= -15) {
+      drive(0, -1, 0 ,0);
+    }
+  }
+
+  public BooleanSupplier isUp() {
+    if (getPitch() >= 15) {
+      return () -> true;
+    } else {
+      return () -> false;
     }
   }
 
