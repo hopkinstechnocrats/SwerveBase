@@ -30,35 +30,35 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 3;
-    public static final int kRearLeftDriveMotorPort = 1;
-    public static final int kFrontRightDriveMotorPort = 5;
-    public static final int kRearRightDriveMotorPort = 7;
+    public static final int kFrontLeftDriveMotorPort = 7;
+    public static final int kRearLeftDriveMotorPort = 5;
+    public static final int kFrontRightDriveMotorPort = 1;
+    public static final int kRearRightDriveMotorPort = 3;
 
-    public static final int kFrontLeftTurningMotorPort = 4;
-    public static final int kRearLeftTurningMotorPort = 2;
-    public static final int kFrontRightTurningMotorPort = 6;
-    public static final int kRearRightTurningMotorPort = 8;
+    public static final int kFrontLeftTurningMotorPort = 8;
+    public static final int kRearLeftTurningMotorPort = 6;
+    public static final int kFrontRightTurningMotorPort = 2;
+    public static final int kRearRightTurningMotorPort = 4;
 
-    public static final int kFrontLeftTurningEncoderPort = 2;
-    public static final int kRearLeftTurningEncoderPort = 1;
-    public static final int kFrontRightTurningEncoderPort = 3;
-    public static final int kRearRightTurningEncoderPort = 4; 
+    public static final int kFrontLeftTurningEncoderPort = 4;
+    public static final int kRearLeftTurningEncoderPort = 3;
+    public static final int kFrontRightTurningEncoderPort = 1;
+    public static final int kRearRightTurningEncoderPort = 2;
 
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearRightTurningEncoderReversed = true;
+    public static final boolean kFrontLeftTurningEncoderReversed = true;
+    public static final boolean kRearLeftTurningEncoderReversed = false;
+    public static final boolean kFrontRightTurningEncoderReversed = true;
+    public static final boolean kRearRightTurningEncoderReversed = false;
 
     public static final int kFrontLeftDriveEncoderPort = 0;
     public static final int kRearLeftDriveEncoderPort = 0;
     public static final int kFrontRightDriveEncoderPort = 0;
     public static final int kRearRightDriveEncoderPort = 0;
 
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
+    public static final boolean kFrontLeftDriveEncoderReversed = true;
+    public static final boolean kRearLeftDriveEncoderReversed = false;
+    public static final boolean kFrontRightDriveEncoderReversed = true;
+    public static final boolean kRearRightDriveEncoderReversed = false;
 
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot
@@ -93,24 +93,24 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
       kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
-    public static final double kFrontRightOffset = -2.998932440316429;
-    public static final double kFrontLeftOffset = 0.796136928912 - Math.PI;
-    public static final double kRearRightOffset = -1.0507768370;
-    public static final double kRearLeftOffset = (-0.069029 + Math.PI) % Math.PI;
+    public static final double kFrontRightOffset = -0.07516505860639658; // -2.998932440316429;
+    public static final double kFrontLeftOffset =1.6520973085528357 + 0.4678641403051204; // 0.796136928912 - Math.PI;
+    public static final double kRearRightOffset = 0.796136928912 + 0.034; // -1.0507768370;
+    public static final double kRearLeftOffset = 0.15339807878856412; //(-0.069029 + Math.PI) % Math.PI;
   }
 
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
     public static double kUModuleTurningController = 10.25;
-    public static double kPModuleTurningController = .73*0.45*kUModuleTurningController;
+    public static double kPModuleTurningController = 1; // .73*0.45*kUModuleTurningController;
     public static double tUModuleTurningController = 0.25;
-    public static double kIModuleTurningController = 1*(.54*kUModuleTurningController)/tUModuleTurningController;
-    public static double kDModuleTurningController = 0*0.0055555555*kUModuleTurningController*tUModuleTurningController;
+    public static double kIModuleTurningController = 0; // 1*(.54*kUModuleTurningController)/tUModuleTurningController;
+    public static double kDModuleTurningController = 0; // 0*0.0055555555*kUModuleTurningController*tUModuleTurningController;
 
-    public static final double kPModuleDriveController = 0.15;
+    public static final double kPModuleDriveController = 0.15; // 0.15;
     public static final double kDModuleDriveController = 0;
-    public static final double kIModuleDriveController = 0.3;
+    public static final double kIModuleDriveController = 0.3; // 0.3;
 
     public static final double MaxAllowableError = 0;
     public static final int kfalconEncoderCPR = 2048;

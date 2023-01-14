@@ -44,6 +44,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
         encoder = new CANCoder(encoderPort, "GertrudeGreyser");
         offset = new Rotation2d(encoderOffset);
 
+        table.getEntry("KpTurning Controller").setDouble(1.1);
+
         //Configure Max & Min outputs of Falcon
         steerMotor.configNominalOutputForward(0);
         steerMotor.configNominalOutputReverse(0);
@@ -52,12 +54,14 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
 
         //Configure PID Values for built in PID on falcon
-        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, table.getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
         steerMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
         steerMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
     }
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
+        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+        //table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
         inputs.positionRad = getPosition().getRadians();
         inputs.toLog(table);
 
@@ -70,8 +74,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Get position using encoder on Falcon
     private Rotation2d getPosition() {
-        return Rotation2d.fromDegrees(steerMotor.getSelectedSensorPosition() /
-                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution);
+        return Rotation2d.fromDegrees(steerMotor.getSelectedSensorPosition());// *
+                // Constants.ModuleConstants.kSteerEncoderTicksPerRevolution);
     }
 
     //Get position using CanCoder
@@ -87,7 +91,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Sets position using built in PID on motor
     public void setPosition(Rotation2d positionRad) {
-        steerMotor.set(ControlMode.Position, tempOffset + positionRad.getRadians());
+        steerMotor.set(ControlMode.Position, (tempOffset + positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
+        // table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
     }
 
     //Sets position using CanCoderPID
