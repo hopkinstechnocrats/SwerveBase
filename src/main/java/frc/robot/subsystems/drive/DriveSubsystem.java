@@ -97,6 +97,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    calculateOffset();
     SmartDashboard.putNumber("PID P Gain Input", 0);
     SmartDashboard.putData("field", m_field);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);

@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import lib.iotemplates.ClosedLoopIO;
 import lib.talonconfiguration.BaseTalonFXConfiguration;
@@ -44,7 +45,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
         encoder = new CANCoder(encoderPort, "GertrudeGreyser");
         offset = new Rotation2d(encoderOffset);
 
-        table.getEntry("KpTurning Controller").setDouble(1.1);
+        inst.getTable("SmartDashboard").getEntry("KpTurning Controller").setDouble(0.0);
 
         //Configure Max & Min outputs of Falcon
         steerMotor.configNominalOutputForward(0);
@@ -54,13 +55,13 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
 
         //Configure PID Values for built in PID on falcon
-        steerMotor.config_kP(0, table.getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
         steerMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
         steerMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
     }
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
-        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
         //table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
         inputs.positionRad = getPosition().getRadians();
         inputs.toLog(table);
@@ -74,8 +75,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Get position using encoder on Falcon
     private Rotation2d getPosition() {
-        return Rotation2d.fromDegrees(steerMotor.getSelectedSensorPosition());// *
-                // Constants.ModuleConstants.kSteerEncoderTicksPerRevolution);
+        return Rotation2d.fromDegrees((steerMotor.getSelectedSensorPosition() /
+                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360);
     }
 
     //Get position using CanCoder
@@ -85,14 +86,14 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Calculates temporary offset as: tempOffset =  Falcon Encoder Value - (Cancoder value - Offset)
     public void calculateOffset() {
-        tempOffset = steerMotor.getSelectedSensorPosition()/
-                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution - getCanCoderPosition().getRadians();
+        steerMotor.setSelectedSensorPosition(getCanCoderPosition().getRadians());
     }
 
     //Sets position using built in PID on motor
     public void setPosition(Rotation2d positionRad) {
-        steerMotor.set(ControlMode.Position, (tempOffset + positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
-        // table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
+        steerMotor.set(ControlMode.Position, (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
+        table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
+        table.getEntry("PositionRad").setDouble(getPosition().getRadians());
     }
 
     //Sets position using CanCoderPID

@@ -108,11 +108,11 @@ public final class Constants {
     public static double kIModuleTurningController = 0; // 1*(.54*kUModuleTurningController)/tUModuleTurningController;
     public static double kDModuleTurningController = 0; // 0*0.0055555555*kUModuleTurningController*tUModuleTurningController;
 
-    public static final double kPModuleDriveController = 0.15; // 0.15;
+    public static final double kPModuleDriveController = 0; // 0.15;
     public static final double kDModuleDriveController = 0;
-    public static final double kIModuleDriveController = 0.3; // 0.3;
+    public static final double kIModuleDriveController = 0; // 0.3;
 
-    public static final double MaxAllowableError = 0;
+    public static final double MaxAllowableError = 100; //encoder ticks
     public static final int kfalconEncoderCPR = 2048;
     public static final double kSteeringGearRatio = 12.8;
     public static final double kDriveGearRatio = 6.75;

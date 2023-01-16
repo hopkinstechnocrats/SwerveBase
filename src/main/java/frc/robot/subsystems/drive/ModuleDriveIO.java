@@ -26,7 +26,7 @@ public class ModuleDriveIO implements ClosedLoopIO {
             ModuleConstants.kPModuleDriveController, ModuleConstants.kIModuleDriveController,
             ModuleConstants.kDModuleDriveController);
 
-    private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(0, 8.634, 0);
+    // private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(0, 8.634, 0);
 
     String corners;
 
@@ -47,7 +47,7 @@ public class ModuleDriveIO implements ClosedLoopIO {
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
         inputs.velocityRadPerSec = getVelocityRadPerSecond();
-        inputs.toLog(table);
+        //inputs.toLog(table);
     }
 
     private double getPositionRad() {
@@ -62,8 +62,8 @@ public class ModuleDriveIO implements ClosedLoopIO {
 
     public void setVelocityRadPerSec(double desiredSpeedRadPerSecond) {
         velocitySetpointRadPerSec = desiredSpeedRadPerSecond;
-        driveOutput = desiredSpeedRadPerSecond / 8.6
-                + (
+        driveOutput = //desiredSpeedRadPerSecond / 8.6 //Feedforward value, without using the command
+                (//+ (
                 inverted ?
                 m_drivePIDController.calculate(getVelocityRadPerSecond(), desiredSpeedRadPerSecond)
                 : -1*m_drivePIDController.calculate(getVelocityRadPerSecond(), desiredSpeedRadPerSecond));
