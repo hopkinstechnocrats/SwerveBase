@@ -55,16 +55,17 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
 
         //Configure PID Values for built in PID on falcon
-        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
+        //steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
         steerMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
         steerMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
     }
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
-        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
+        //steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
         //table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
-        inputs.positionRad = getPosition().getRadians();
-        inputs.toLog(table);
+        // inputs.positionRad = getPosition().getRadians();
+        //inputs.toLog(table);
 
         m_canCoderSteeringPIDController.setP(Constants.ModuleConstants.kPModuleTurningController);
         m_canCoderSteeringPIDController.setI(Constants.ModuleConstants.kIModuleTurningController);
@@ -94,6 +95,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.set(ControlMode.Position, (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
         table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
         table.getEntry("PositionRad").setDouble(getPosition().getRadians());
+        table.getEntry("MotorPower").setDouble(steerMotor.getMotorOutputVoltage());
     }
 
     //Sets position using CanCoderPID

@@ -102,17 +102,17 @@ public final class Constants {
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 0.5 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 0.5 * Math.PI;
-    public static double kUModuleTurningController = 10.25;
-    public static double kPModuleTurningController = 1; // .73*0.45*kUModuleTurningController;
-    public static double tUModuleTurningController = 0.25;
-    public static double kIModuleTurningController = 0; // 1*(.54*kUModuleTurningController)/tUModuleTurningController;
-    public static double kDModuleTurningController = 0; // 0*0.0055555555*kUModuleTurningController*tUModuleTurningController;
+    public static double kUModuleTurningController = 3;
+    public static double kPModuleTurningController = .5*kUModuleTurningController;
+    public static double tUModuleTurningController = .5; // Seconds
+    public static double kIModuleTurningController = 0*(.54*kUModuleTurningController)/tUModuleTurningController;
+    public static double kDModuleTurningController = 0*0.666666666*kUModuleTurningController*tUModuleTurningController;
 
     public static final double kPModuleDriveController = 0; // 0.15;
     public static final double kDModuleDriveController = 0;
     public static final double kIModuleDriveController = 0; // 0.3;
 
-    public static final double MaxAllowableError = 100; //encoder ticks
+    public static final double MaxAllowableError = 0; //encoder ticks
     public static final int kfalconEncoderCPR = 2048;
     public static final double kSteeringGearRatio = 12.8;
     public static final double kDriveGearRatio = 6.75;
