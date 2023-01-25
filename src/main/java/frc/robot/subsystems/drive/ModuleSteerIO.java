@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import lib.iotemplates.ClosedLoopIO;
 import lib.talonconfiguration.BaseTalonFXConfiguration;
@@ -92,7 +91,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Sets position using built in PID on motor
     public void setPosition(Rotation2d positionRad) {
-        steerMotor.set(ControlMode.Position, (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
+        steerMotor.set(ControlMode.Position, 
+        (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
         table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
         table.getEntry("PositionRad").setDouble(getPosition().getRadians());
         table.getEntry("MotorPower").setDouble(steerMotor.getMotorOutputVoltage());

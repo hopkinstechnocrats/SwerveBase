@@ -98,34 +98,34 @@ public class RobotContainer {
       POVButton DPadBottom = new POVButton(m_driverController, 270);
       POVButton DPadLeft = new POVButton(m_driverController, 0);
 
-      AButton.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-      BButton.whenPressed(new InstantCommand(() -> m_robotDrive.resetOdometry(zeroPose)));
+      AButton.onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      BButton.onTrue(new InstantCommand(() -> m_robotDrive.resetOdometry(zeroPose)));
 
       //Turns on Brake mode, rotates all wheels to 45 degrees relative to the frame, and then disables brake mode when you let go
-      XButton.whileHeld(new RunCommand(() -> m_robotDrive.defence(), m_robotDrive).beforeStarting(
+      XButton.whileTrue(new RunCommand(() -> m_robotDrive.defence(), m_robotDrive).beforeStarting(
           new InstantCommand(() -> m_robotDrive.setBrakeMode(true)))
           );
-      XButton.whenReleased(new InstantCommand(() -> m_robotDrive.setBrakeMode(false)));
+      XButton.onFalse(new InstantCommand(() -> m_robotDrive.setBrakeMode(false)));
       // DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));
       
       //AutoRotate to desired heading
-      DPadTop.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadTop.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       0,
       m_driverController.getRightTriggerAxis()), m_robotDrive));
 
-      DPadRight.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadRight.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       Math.PI/2,
       m_driverController.getRightTriggerAxis()), m_robotDrive));
 
-      DPadBottom.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadBottom.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       Math.PI,
       m_driverController.getRightTriggerAxis()), m_robotDrive));
 
 
-      DPadLeft.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadLeft.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       -Math.PI/2,
       m_driverController.getRightTriggerAxis()), m_robotDrive));
