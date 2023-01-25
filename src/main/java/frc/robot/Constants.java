@@ -83,6 +83,8 @@ public final class Constants {
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
     public static final double kWheelHeight = .1;//meters
 
+    public static final double kMetersPerRevolution = kWheelHeight * Math.PI; // Circumfrence
+
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kBoostModifier = 1;
     

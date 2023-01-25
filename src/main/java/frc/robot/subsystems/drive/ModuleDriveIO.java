@@ -50,7 +50,7 @@ public class ModuleDriveIO implements ClosedLoopIO {
         //inputs.toLog(table);
     }
 
-    private double getPositionRad() {
+    double getPositionRad() {
         return Units.rotationsToRadians(
                 driveMotor.getSelectedSensorPosition() / ModuleConstants.kDriveEncoderTicksPerRevolution);
     }

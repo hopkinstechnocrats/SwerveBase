@@ -16,7 +16,7 @@ public class TunableNumber {
         if (tuningMode) {
             SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
         } else {
-            SmartDashboard.delete(key);
+            SmartDashboard.getEntry(key).unpublish();
         }
     }
 

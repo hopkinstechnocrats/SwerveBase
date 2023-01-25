@@ -75,7 +75,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
     }
 
     //Get position using encoder on Falcon
-    private Rotation2d getPosition() {
+    Rotation2d getPosition() {
         return Rotation2d.fromDegrees((steerMotor.getSelectedSensorPosition() /
                 Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360);
     }

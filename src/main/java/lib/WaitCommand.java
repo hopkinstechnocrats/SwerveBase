@@ -13,6 +13,6 @@ public class WaitCommand extends CommandBase {
     }
 
     public boolean isFinished() {
-        return button.get();
+        return button.getAsBoolean();
     }
 }

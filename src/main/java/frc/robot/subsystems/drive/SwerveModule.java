@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import lib.iotemplates.ClosedLoopIO;
@@ -59,6 +60,13 @@ public class SwerveModule {
     return new SwerveModuleState(
             (driveInputs.velocityRadPerSec * (Constants.DriveConstants.kWheelHeight / 2)),
             new Rotation2d(steerInputs.positionRad));
+  }
+
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(
+      driveIO.getPositionRad() / (2 * Math.PI) * Constants.DriveConstants.kMetersPerRevolution,
+      steerIO.getPosition()
+    );
   }
   //
 
