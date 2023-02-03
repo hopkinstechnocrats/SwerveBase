@@ -30,20 +30,20 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 7;
-    public static final int kRearLeftDriveMotorPort = 5;
-    public static final int kFrontRightDriveMotorPort = 1;
+    public static final int kFrontLeftDriveMotorPort = 1;
+    public static final int kRearLeftDriveMotorPort = 4;
+    public static final int kFrontRightDriveMotorPort = 2;
     public static final int kRearRightDriveMotorPort = 3;
 
-    public static final int kFrontLeftTurningMotorPort = 8;
-    public static final int kRearLeftTurningMotorPort = 6;
-    public static final int kFrontRightTurningMotorPort = 2;
-    public static final int kRearRightTurningMotorPort = 4;
+    public static final int kFrontLeftTurningMotorPort = 5;
+    public static final int kRearLeftTurningMotorPort = 8;
+    public static final int kFrontRightTurningMotorPort = 6;
+    public static final int kRearRightTurningMotorPort = 7;
 
-    public static final int kFrontLeftTurningEncoderPort = 4;
+    public static final int kFrontLeftTurningEncoderPort = 2;
     public static final int kRearLeftTurningEncoderPort = 3;
-    public static final int kFrontRightTurningEncoderPort = 1;
-    public static final int kRearRightTurningEncoderPort = 2;
+    public static final int kFrontRightTurningEncoderPort = 0;
+    public static final int kRearRightTurningEncoderPort = 1;
 
     public static final boolean kFrontLeftTurningEncoderReversed = true;
     public static final boolean kRearLeftTurningEncoderReversed = false;
@@ -95,8 +95,8 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
       kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
-    public static final double kFrontRightOffset = -0.07516505860639658; // -2.998932440316429;
-    public static final double kFrontLeftOffset =1.6520973085528357 + 0.4678641403051204; // 0.796136928912 - Math.PI;
+    public static final double kFrontRightOffset = -0.07516505860639658 + Math.PI; // -2.998932440316429;
+    public static final double kFrontLeftOffset =1.6520973085528357 + 0.4678641403051204 + Math.PI; // 0.796136928912 - Math.PI;
     public static final double kRearRightOffset = 0.796136928912 + 0.034; // -1.0507768370;
     public static final double kRearLeftOffset = 0.15339807878856412; //(-0.069029 + Math.PI) % Math.PI;
   }

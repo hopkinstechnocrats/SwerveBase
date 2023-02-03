@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 import frc.robot.Constants;
 import lib.iotemplates.ClosedLoopIO;
 import lib.talonconfiguration.BaseTalonFXConfiguration;
@@ -20,7 +21,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
     NetworkTable table;
 
     WPI_TalonFX steerMotor;
-    CANCoder encoder;
+    AnalogEncoder encoder;
     Rotation2d offset;
     double tempOffset;
     double positionSetPointRad;
@@ -35,13 +36,13 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     public ModuleSteerIO(int motorPort, int encoderPort, double encoderOffset, String corners) {
         table = inst.getTable(corners);
-        steerMotor = new WPI_TalonFX(motorPort, "GertrudeGreyser");
+        steerMotor = new WPI_TalonFX(motorPort);
         steerMotor.configAllSettings(new BaseTalonFXConfiguration());
         steerMotor.setNeutralMode(NeutralMode.Brake);
         // set status frame period of steer motor
         steerMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
         m_canCoderSteeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
-        encoder = new CANCoder(encoderPort, "GertrudeGreyser");
+        encoder = new AnalogEncoder(encoderPort);
         offset = new Rotation2d(encoderOffset);
 
         inst.getTable("SmartDashboard").getEntry("KpTurning Controller").setDouble(0.0);

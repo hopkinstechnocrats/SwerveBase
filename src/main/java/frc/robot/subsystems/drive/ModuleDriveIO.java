@@ -32,7 +32,7 @@ public class ModuleDriveIO implements ClosedLoopIO {
     public ModuleDriveIO(int motorPort, boolean inverted, String corners) {
         table = inst.getTable(corners);
         this.inverted = inverted;
-        driveMotor = new WPI_TalonFX(motorPort, "GertrudeGreyser");
+        driveMotor = new WPI_TalonFX(motorPort);
         // set status frame period of drive motor
         driveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
         driveMotor.configAllSettings(new BaseTalonFXConfiguration());
