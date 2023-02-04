@@ -95,10 +95,10 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
       kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
-    public static final double kFrontRightOffset = 0.015578;
-    public static final double kFrontLeftOffset = 0.008255;
-    public static final double kRearRightOffset = 0.006505;
-    public static final double kRearLeftOffset = 0.01478;
+    public static final double kFrontRightOffset = 0.8934;
+    public static final double kFrontLeftOffset = 0.9793;
+    public static final double kRearRightOffset = 0.8768;
+    public static final double kRearLeftOffset = 0.3515;
   }
 
   public static final class ModuleConstants {
@@ -107,8 +107,8 @@ public final class Constants {
     public static double kUModuleTurningController = 3;
     public static double kPModuleTurningController = .5*kUModuleTurningController;
     public static double tUModuleTurningController = .5; // Seconds
-    public static double kIModuleTurningController = 0*(.54*kUModuleTurningController)/tUModuleTurningController;
-    public static double kDModuleTurningController = 0*0.666666666*kUModuleTurningController*tUModuleTurningController;
+    public static double kIModuleTurningController = 0*(.4*kUModuleTurningController)/tUModuleTurningController;
+    public static double kDModuleTurningController = 0*0.0666666666*kUModuleTurningController*tUModuleTurningController;
 
     public static final double kPModuleDriveController = 0; // 0.15;
     public static final double kDModuleDriveController = 0;

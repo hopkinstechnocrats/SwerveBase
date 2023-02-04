@@ -46,6 +46,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
         offset = new Rotation2d(encoderOffset);
 
         inst.getTable("SmartDashboard").getEntry("KpTurning Controller").setDouble(0.0);
+        table.getEntry("PositionRad").setDouble(0.0);
 
         //Configure Max & Min outputs of Falcon
         steerMotor.configNominalOutputForward(0);
@@ -55,14 +56,14 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
 
         //Configure PID Values for built in PID on falcon
-        //steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
-        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
+        //steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
         steerMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
         steerMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
     }
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
-        //steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
+        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
         //table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
         // inputs.positionRad = getPosition().getRadians();
         //inputs.toLog(table);
@@ -82,7 +83,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Get position using CanCoder
     public Rotation2d getCanCoderPosition() {
-        return Rotation2d.fromDegrees(encoder.getAbsolutePosition()).minus(offset);
+        return Rotation2d.fromRadians(encoder.getAbsolutePosition()).minus(offset);
     }
 
     //Calculates temporary offset as: tempOffset =  Falcon Encoder Value - (Cancoder value - Offset)
