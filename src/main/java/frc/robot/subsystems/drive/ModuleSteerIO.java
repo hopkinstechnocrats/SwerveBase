@@ -81,7 +81,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
     }
 
     //Get position using CanCoder
-    private Rotation2d getCanCoderPosition() {
+    public Rotation2d getCanCoderPosition() {
         return Rotation2d.fromDegrees(encoder.getAbsolutePosition()).minus(offset);
     }
 
