@@ -50,7 +50,7 @@ public class SwerveModule {
     steerIO.updateInputs(steerInputs);
     driveIO.updateInputs(driveInputs);
 
-    //desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+    desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
     steerIO.setPosition(desiredState.angle);
     driveIO.setVelocityRadPerSec(desiredState.speedMetersPerSecond / (Constants.DriveConstants.kWheelHeight / 2));
 

@@ -56,15 +56,15 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.configAllowableClosedloopError(0, Constants.ModuleConstants.MaxAllowableError);
 
         //Configure PID Values for built in PID on falcon
-        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
-        //steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
+        // steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0)); // Constants.ModuleConstants.kPModuleTurningController);
+        steerMotor.config_kP(0, Constants.ModuleConstants.kPModuleTurningController);
         steerMotor.config_kI(0, Constants.ModuleConstants.kIModuleTurningController);
         steerMotor.config_kD(0, Constants.ModuleConstants.kDModuleTurningController);
     }
 
     public void updateInputs(ClosedLoopIOInputs inputs) {
-        steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
-        //table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
+        // steerMotor.config_kP(0, inst.getTable("SmartDashboard").getEntry("KpTurning Controller").getDouble(0));
+        // table.getEntry("Rot Pos Act").setDouble(getPosition().getRadians());
         // inputs.positionRad = getPosition().getRadians();
         //inputs.toLog(table);
 
