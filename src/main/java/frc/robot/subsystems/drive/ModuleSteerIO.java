@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -19,6 +19,10 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table;
+
+    Rotation2d delta;
+    Rotation2d deltaMod;
+    Rotation2d currentPos;
 
     WPI_TalonFX steerMotor;
     AnalogEncoder encoder;
@@ -77,8 +81,8 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Get position using encoder on Falcon
     Rotation2d getPosition() {
-        return Rotation2d.fromDegrees((steerMotor.getSelectedSensorPosition() /
-                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360);
+        return Rotation2d.fromDegrees(((steerMotor.getSelectedSensorPosition() /
+                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360) % 360);
     }
 
     //Get position using CanCoder
@@ -91,8 +95,23 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.setSelectedSensorPosition(Constants.ModuleConstants.kSteerEncoderTicksPerRevolution*getCanCoderPosition().getRadians());
     }
 
+    public Rotation2d fixRot(Rotation2d position) {
+        currentPos = getPosition();
+        // Calculate Error
+        delta = position.minus(currentPos);
+
+        // Make sure angle is between pi and -pi
+        deltaMod = Rotation2d.fromDegrees(delta.getDegrees() % 360);
+        deltaMod = deltaMod.getRadians() < 2*Math.PI ? new Rotation2d().fromRadians(deltaMod.getRadians() + (2*Math.PI)) : deltaMod;
+        deltaMod = deltaMod.getDegrees() > Math.PI ? new Rotation2d().fromRadians(deltaMod.getRadians() - (2*Math.PI)) : deltaMod;
+
+        //Return final deesired angle
+        return currentPos.plus(deltaMod);
+    }
+
     //Sets position using built in PID on motor
     public void setPosition(Rotation2d positionRad) {
+        positionRad = fixRot(positionRad);
         steerMotor.set(ControlMode.Position, 
         (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
         table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
