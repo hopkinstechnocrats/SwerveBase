@@ -88,7 +88,7 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Calculates temporary offset as: tempOffset =  Falcon Encoder Value - (Cancoder value - Offset)
     public void calculateOffset() {
-        steerMotor.setSelectedSensorPosition(getCanCoderPosition().getRadians());
+        steerMotor.setSelectedSensorPosition(Constants.ModuleConstants.kSteerEncoderTicksPerRevolution*getCanCoderPosition().getRadians());
     }
 
     //Sets position using built in PID on motor
