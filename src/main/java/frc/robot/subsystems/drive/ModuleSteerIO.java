@@ -20,9 +20,12 @@ public class ModuleSteerIO implements ClosedLoopIO {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table;
 
-    Rotation2d delta;
-    Rotation2d deltaMod;
-    Rotation2d currentPos;
+    double delta;
+    double deltaMod;
+    double currentPos;
+    double setpoint;
+    double desiredRot;
+    double toBeModuled;
 
     WPI_TalonFX steerMotor;
     AnalogEncoder encoder;
@@ -81,8 +84,12 @@ public class ModuleSteerIO implements ClosedLoopIO {
 
     //Get position using encoder on Falcon
     Rotation2d getPosition() {
-        return Rotation2d.fromDegrees(((steerMotor.getSelectedSensorPosition() /
-                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360) % 360);
+        return Rotation2d.fromDegrees((steerMotor.getSelectedSensorPosition() /
+                Constants.ModuleConstants.kSteerEncoderTicksPerRevolution) * 360);
+    }
+
+    Rotation2d getAbsPosition() {
+        return new Rotation2d().fromRadians(getPosition().getRadians() % (2 * Math.PI));
     }
 
     //Get position using CanCoder
@@ -95,27 +102,36 @@ public class ModuleSteerIO implements ClosedLoopIO {
         steerMotor.setSelectedSensorPosition(Constants.ModuleConstants.kSteerEncoderTicksPerRevolution*getCanCoderPosition().getRadians());
     }
 
-    public Rotation2d fixRot(Rotation2d position) {
-        currentPos = getPosition();
-        // Calculate Error
-        delta = position.minus(currentPos);
+    public double fixRot(Rotation2d position) {
+        currentPos = getPosition().getRadians();
+        
+        // Calculate actual angle
+        //delta = currentPos % (2 * Math.PI);
 
-        // Make sure angle is between pi and -pi
-        deltaMod = Rotation2d.fromDegrees(delta.getDegrees() % 360);
-        deltaMod = deltaMod.getRadians() < 2*Math.PI ? new Rotation2d().fromRadians(deltaMod.getRadians() + (2*Math.PI)) : deltaMod;
-        deltaMod = deltaMod.getDegrees() > Math.PI ? new Rotation2d().fromRadians(deltaMod.getRadians() - (2*Math.PI)) : deltaMod;
+        toBeModuled = (position.getRadians() - (currentPos) + Math.PI/2);
+        
+        if (toBeModuled < 0) {
+            delta = Math.PI + (toBeModuled % (Math.PI)) - (Math.PI/2);
+        } else {  
+            delta = (toBeModuled % (Math.PI)) - (Math.PI/2);
+        }
+        // TODO: NEGATIVE NELLY'S AINT FUN DO THIS
+        desiredRot = currentPos + delta;
+        // Make sure angle is between Pi and -Pi
+        // deltaMod = (deltaMod - currentPos) > Math.PI ? deltaMod - (2 * Math.PI) : deltaMod;
+        // deltaMod = (deltaMod - currentPos) < -Math.PI ? deltaMod + (2 * Math.PI) : deltaMod;
 
-        //Return final deesired angle
-        return currentPos.plus(deltaMod);
+        //Return final desired angle
+        return desiredRot;
     }
 
     //Sets position using built in PID on motor
     public void setPosition(Rotation2d positionRad) {
-        positionRad = fixRot(positionRad);
+        setpoint = fixRot(positionRad);
         steerMotor.set(ControlMode.Position, 
-        (positionRad.getRadians())* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
-        table.getEntry("Rot Setpoint").setDouble(positionRad.getRadians());
-        table.getEntry("PositionRad").setDouble(getPosition().getRadians());
+        (setpoint)* (Constants.ModuleConstants.kSteerEncoderTicksPerRevolution)/(2*Math.PI));
+        table.getEntry("Rot Setpoint").setDouble(setpoint);
+        table.getEntry("PositionRad").setDouble(getAbsPosition().getRadians());
         table.getEntry("MotorPower").setDouble(steerMotor.getMotorOutputVoltage());
     }
 

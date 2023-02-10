@@ -61,8 +61,8 @@ public class ModuleDriveIO implements ClosedLoopIO {
 
     public void setVelocityRadPerSec(double desiredSpeedRadPerSecond) {
         velocitySetpointRadPerSec = desiredSpeedRadPerSecond;
-        driveOutput = //desiredSpeedRadPerSecond / 8.6 //Feedforward value, without using the command
-                (//+ (
+        driveOutput = desiredSpeedRadPerSecond / 8.6 //Feedforward value, without using the command
+                + (
                 inverted ?
                 m_drivePIDController.calculate(getVelocityRadPerSecond(), desiredSpeedRadPerSecond)
                 : -1*m_drivePIDController.calculate(getVelocityRadPerSecond(), desiredSpeedRadPerSecond));

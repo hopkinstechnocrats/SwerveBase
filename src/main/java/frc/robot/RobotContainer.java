@@ -66,10 +66,10 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftX(),
-                    -1*m_driverController.getLeftY(),
-                    -6*m_driverController.getRightX(),
-                    m_driverController.getRightTriggerAxis()), m_robotDrive)); // use this to change from field oriented to non-field oriented
+                    3*m_driverController.getLeftY(),
+                    3*m_driverController.getLeftX(),
+                    3*m_driverController.getRightX(),
+               m_driverController.getRightTriggerAxis()), m_robotDrive)); // use this to change from field oriented to non-field oriented
 
     // singleModuleTestFixture.setDefaultCommand(
     //         new RunCommand(
