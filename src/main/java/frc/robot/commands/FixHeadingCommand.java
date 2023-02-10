@@ -1,14 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveSubsystem;
-
-import java.awt.*;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 
 public class FixHeadingCommand extends CommandBase {
@@ -40,8 +36,7 @@ public class FixHeadingCommand extends CommandBase {
                 -1*driverController.getLeftY(),
                 -1*driverController.getLeftX(),
                 driverController.getRightTriggerAxis(),
-                output,
-                true);
+                output);
     }
 
     @Override

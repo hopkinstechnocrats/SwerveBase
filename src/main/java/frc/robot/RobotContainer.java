@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,32 +13,22 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.SingleModuleTestFixture;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj.DataLogManager;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import lib.Loggable;
 
 
 /*
@@ -58,6 +49,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+      //Start logging
+      DataLogManager.start();
+      DataLog log = DataLogManager.getLog();
+      //Log Driverstation Inputs
+      DriverStation.startDataLog(log);
     // Configure the button bindings
     configureButtonBindings();
     // loggables.add(driv);
@@ -70,11 +66,10 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    -1*m_driverController.getLeftY(),
-                    -1*m_driverController.getLeftX(),
-                    -6*m_driverController.getRightX(),
-                    m_driverController.getRightTriggerAxis(),
-                    true), m_robotDrive)); // use this to change from field oriented to non-field oriented
+                    3*m_driverController.getLeftY(),
+                    3*m_driverController.getLeftX(),
+                    3*m_driverController.getRightX(),
+               m_driverController.getRightTriggerAxis()), m_robotDrive)); // use this to change from field oriented to non-field oriented
 
     // singleModuleTestFixture.setDefaultCommand(
     //         new RunCommand(
@@ -103,41 +98,37 @@ public class RobotContainer {
       POVButton DPadBottom = new POVButton(m_driverController, 270);
       POVButton DPadLeft = new POVButton(m_driverController, 0);
 
-      AButton.whenPressed(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-      BButton.whenPressed(new InstantCommand(() -> m_robotDrive.resetOdometry(zeroPose)));
+      AButton.onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      BButton.onTrue(new InstantCommand(() -> m_robotDrive.resetOdometry(zeroPose)));
 
       //Turns on Brake mode, rotates all wheels to 45 degrees relative to the frame, and then disables brake mode when you let go
-      XButton.whileHeld(new RunCommand(() -> m_robotDrive.defence(), m_robotDrive).beforeStarting(
-          new InstantCommand(() -> m_robotDrive.brakeMode(true)))
+      XButton.whileTrue(new RunCommand(() -> m_robotDrive.defence(), m_robotDrive).beforeStarting(
+          new InstantCommand(() -> m_robotDrive.setBrakeMode(true)))
           );
-      XButton.whenReleased(new InstantCommand(() -> m_robotDrive.brakeMode(false)));
+      XButton.onFalse(new InstantCommand(() -> m_robotDrive.setBrakeMode(false)));
       // DButton.whenPressed(new InstantCommand(() -> singleModuleTestFixture.setAngle(new Rotation2d(0, -1))));
       
       //AutoRotate to desired heading
-      DPadTop.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadTop.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       0,
-      m_driverController.getRightTriggerAxis(),
-      true), m_robotDrive));
+      m_driverController.getRightTriggerAxis()), m_robotDrive));
 
-      DPadRight.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadRight.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       Math.PI/2,
-      m_driverController.getRightTriggerAxis(),
-      true), m_robotDrive));
+      m_driverController.getRightTriggerAxis()), m_robotDrive));
 
-      DPadBottom.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadBottom.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       Math.PI,
-      m_driverController.getRightTriggerAxis(),
-      true), m_robotDrive));
+      m_driverController.getRightTriggerAxis()), m_robotDrive));
 
 
-      DPadLeft.whileHeld(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
+      DPadLeft.whileTrue(new RunCommand(() -> m_robotDrive.autoRotate(-1*m_driverController.getLeftY(),
       -1*m_driverController.getLeftX(),
       -Math.PI/2,
-      m_driverController.getRightTriggerAxis(),
-      true), m_robotDrive));
+      m_driverController.getRightTriggerAxis()), m_robotDrive));
 
   }
 
@@ -151,7 +142,10 @@ public class RobotContainer {
     TrajectoryConfig config =
         new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                AutoConstants.kMaxSpeedMetersPerSecond)
+                //,
+                //                AutoConstants.kMaxAccelerationMetersPerSecondSquared
+
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
 
@@ -188,6 +182,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, 0, false));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, 0));
   }
 }
