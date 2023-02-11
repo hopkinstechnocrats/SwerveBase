@@ -49,6 +49,7 @@ public class ModuleDriveIO implements ClosedLoopIO {
     public void updateInputs(ClosedLoopIOInputs inputs) {
         inputs.velocityRadPerSec = getVelocityRadPerSecond();
         inputs.appliedVolts = driveMotor.getMotorOutputVoltage();
+        inputs.positionRad = getPositionRad();
         inputs.toLog(table);
     }
 
