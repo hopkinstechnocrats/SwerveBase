@@ -63,7 +63,7 @@ public class SwerveModule {
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
-      driveIO.getPositionRad() / (2 * Math.PI) * Constants.DriveConstants.kMetersPerRevolution,
+      (driveIO.getPositionRad() / (2 * Math.PI)) * Constants.DriveConstants.kMetersPerRevolution,
       steerIO.getPosition()
     );
   }
