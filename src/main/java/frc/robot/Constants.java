@@ -120,7 +120,7 @@ public final class Constants {
     public static final double kDriveGearRatio = 6.75;
 
     public static final double kSteerEncoderTicksPerRevolution = kfalconEncoderCPR * kSteeringGearRatio;
-    public static final double kDriveEncoderTicksPerRevolution = kfalconEncoderCPR + kDriveGearRatio;
+    public static final double kDriveEncoderTicksPerRevolution = kfalconEncoderCPR * kDriveGearRatio;
   }
 
   public static final class OIConstants {

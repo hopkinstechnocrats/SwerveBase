@@ -53,9 +53,6 @@ public class SwerveModule {
     desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
     steerIO.setPosition(desiredState.angle);
     driveIO.setVelocityRadPerSec(desiredState.speedMetersPerSecond / (Constants.DriveConstants.kWheelHeight / 2));
-
-    table.getEntry("MagEncoder Value").setDouble(steerIO.getCanCoderPosition().getRadians());
-
   }
 
   public SwerveModuleState getState() {
@@ -66,7 +63,7 @@ public class SwerveModule {
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
-      driveIO.getPositionRad() / (2 * Math.PI) * Constants.DriveConstants.kMetersPerRevolution,
+      (driveIO.getPositionRad() / (2 * Math.PI)) * Constants.DriveConstants.kMetersPerRevolution,
       steerIO.getPosition()
     );
   }
